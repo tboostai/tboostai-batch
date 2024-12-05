@@ -20,17 +20,17 @@ public class DataSourceConfig {
 
     // Primary DataSource for Core DB
     @Primary
-    @Bean(name = "primaryDataSource")
+    @Bean(name = {"primaryDataSource", "dataSource"})
     @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource primaryDataSource() {
-        return DataSourceBuilder.create().build();  // 使用连接池
+        return DataSourceBuilder.create().build();
     }
 
     // Batch DataSource for Batch DB
     @Bean(name = "batchDataSource")
     @ConfigurationProperties(prefix = "spring.batch.datasource")
     public DataSource batchDataSource() {
-        return DataSourceBuilder.create().build();  // 使用连接池
+        return DataSourceBuilder.create().build();
     }
 
     // Primary EntityManagerFactory for Core DB

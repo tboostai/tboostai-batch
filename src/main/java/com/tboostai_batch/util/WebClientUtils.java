@@ -14,7 +14,7 @@ import reactor.util.retry.Retry;
 import java.time.Duration;
 import java.util.Map;
 
-import static com.tboostai_batch.common.GeneralConstants.TIMEOUT_30_SECONDS;
+import static com.tboostai_batch.common.GeneralConstants.TIMEOUT_60_SECONDS;
 import static com.tboostai_batch.common.GeneralConstants.WEBCLIENT_BUFFER_SIZE;
 
 @Component
@@ -45,11 +45,11 @@ public class WebClientUtils {
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
                     logger.error("4xx error occurred while requesting {}: {}", uri, clientResponse.statusCode());
-                    return Mono.error(new RuntimeException("Client error occurred while requesting " + uri));
+                    return Mono.empty();
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
                     logger.error("5xx error occurred while requesting {}: {}", uri, clientResponse.statusCode());
-                    return Mono.error(new RuntimeException("Server error occurred while requesting " + uri));
+                    return Mono.empty();
                 })
                 .bodyToMono(responseType);
 
@@ -64,7 +64,7 @@ public class WebClientUtils {
                 .doOnError(e -> logger.error("Error occurred while calling {}: {}", uri, e.getMessage(), e))
                 .onErrorResume(e -> {
                     logger.error("Handling error for {}: {}", uri, e.getMessage(), e);
-                    return Mono.error(new RuntimeException("Failed to retrieve data from " + uri, e));
+                    return Mono.empty();
                 });
     }
 
@@ -85,11 +85,11 @@ public class WebClientUtils {
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> {
                     logger.error("4xx error occurred while requesting {}: {}", uri, clientResponse.statusCode());
-                    return Mono.error(new RuntimeException("Client error occurred while requesting " + uri));
+                    return Mono.empty();
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> {
                     logger.error("5xx error occurred while requesting {}: {}", uri, clientResponse.statusCode());
-                    return Mono.error(new RuntimeException("Server error occurred while requesting " + uri));
+                    return Mono.empty();
                 })
                 .bodyToMono(responseType);
 
@@ -104,7 +104,7 @@ public class WebClientUtils {
                 .doOnError(e -> logger.error("Error occurred while calling {}: {}", uri, e.getMessage(), e))  // Ensure all exceptions are logged
                 .onErrorResume(e -> {
                     logger.error("Handling error for {}: {}", uri, e.getMessage(), e);
-                    return Mono.error(new RuntimeException("Failed to retrieve data from " + uri, e));
+                    return Mono.empty();
                 });
     }
 
@@ -120,15 +120,15 @@ public class WebClientUtils {
                         Mono.error(new RuntimeException("Server error occurred while requesting " + uri))
                 )
                 .bodyToMono(responseType)
-                .timeout(Duration.ofSeconds(TIMEOUT_30_SECONDS))
+                .timeout(Duration.ofSeconds(TIMEOUT_60_SECONDS))
                 .doOnError(WebClientResponseException.class, e -> logger.error("Error response: {}", e.getResponseBodyAsString()))
                 .onErrorResume(e -> {
                     if (e instanceof io.netty.handler.timeout.ReadTimeoutException) {
                         logger.error("Timeout error while calling {}: {}", uri, e.getMessage());
-                        return Mono.error(new RuntimeException("Request to " + uri + " timed out", e));
+                        return Mono.empty();
                     }
                     logger.error("Error occurred while requesting {}: {}", uri, e.getMessage(), e);
-                    return Mono.error(new RuntimeException("Failed to retrieve data from " + uri, e));
+                    return Mono.empty();
                 });
     }
 
@@ -145,7 +145,8 @@ public class WebClientUtils {
                 .bodyToMono(responseType)
                 .doOnError(WebClientResponseException.class, e -> logger.error("Error response: {}", e.getResponseBodyAsString()))
                 .onErrorResume(e -> {
-                    throw new RuntimeException("Failed to retrieve data from " + uri, e);
+                    logger.error("Failed to retrieve data from {}", uri);
+                    return Mono.empty();
                 });
     }
 }

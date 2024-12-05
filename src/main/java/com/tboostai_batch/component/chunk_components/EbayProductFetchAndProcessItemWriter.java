@@ -17,7 +17,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -47,7 +46,6 @@ public class EbayProductFetchAndProcessItemWriter implements ItemWriter<List<Eba
     }
 
     @Override
-    @Transactional
     public void write(Chunk<? extends List<EbayCompleteInfo>> chunk) {
         logger.info("Write Product Data Chunk");
         List<? extends List<EbayCompleteInfo>> ebayCompleteInfoList = chunk.getItems();

@@ -38,6 +38,10 @@ public class EbayProductFetchAndProcessItemProcessor implements ItemProcessor<Li
         logger.info("Process Product Data Chunk");
         List<EbayCompleteInfo> ebayCompleteInfoList = new ArrayList<>();
 
+        if(ebayRespEntityBasicsJsonDTO.isEmpty()) {
+            return ebayCompleteInfoList;
+        }
+
         ebayRespEntityBasicsJsonDTO.forEach(ebayRespBasicDTO -> {
             List<Availability> availabilities = mapperManager.getMapper(AvailabilityMapper.class).toAvailabilities(ebayRespBasicDTO.getEstimatedAvailabilities());
             EbayAdditionalInfo ebayAdditionalInfo = mapperManager.getMapper(EbayAdditionalInfoMapper.class).toEbayAdditionalInfo(ebayRespBasicDTO, ebayRespBasicDTO.getShipToLocations());

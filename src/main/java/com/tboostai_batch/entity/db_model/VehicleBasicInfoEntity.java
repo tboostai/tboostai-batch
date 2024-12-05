@@ -18,16 +18,16 @@ public class VehicleBasicInfoEntity implements Serializable {
     @Column(name = "id")
     private Long uuid;
 
-    @Column(name = "make", length = 50)
+    @Column(name = "make", length = 100)
     private String make;
 
-    @Column(name = "model", length = 50)
+    @Column(name = "model", length = 100)
     private String model;
 
     @Column(name = "year")
     private int year;
 
-    @Column(name = "trim", length = 50)
+    @Column(name = "trim", length = 100)
     private String trim;
 
     @Column(name = "vin", length = 20)
@@ -39,16 +39,16 @@ public class VehicleBasicInfoEntity implements Serializable {
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<VehiclePriceEntity> price;
 
-    @Column(name = "exterior_color", length = 50)
+    @Column(name = "exterior_color", length = 100)
     private String exteriorColor;
 
-    @Column(name = "interior_color", length = 50)
+    @Column(name = "interior_color", length = 100)
     private String interiorColor;
 
-    @Column(name = "body_type", length = 30)
+    @Column(name = "body_type", length = 50)
     private String bodyType;
 
-    @Column(name = "engine_type", length = 30)
+    @Column(name = "engine_type", length = 50)
     private String engineType;
 
     @Column(name = "engine_size", precision = 3, scale = 1)
@@ -57,10 +57,10 @@ public class VehicleBasicInfoEntity implements Serializable {
     @Column(name = "cylinder")
     private int cylinder;
 
-    @Column(name = "transmission", length = 30)
+    @Column(name = "transmission", length = 50)
     private String transmission;
 
-    @Column(name = "drivetrain", length = 50)
+    @Column(name = "drivetrain", length = 100)
     private String drivetrain;
 
     @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -73,7 +73,7 @@ public class VehicleBasicInfoEntity implements Serializable {
     @Column(name = "engine_info", length = 150)
     private String engineInfo;
 
-    @Column(name = "cylinder_info", length = 50)
+    @Column(name = "cylinder_info", length = 100)
     private String cylinderInfo;
 
     @Column(name = "warranty", length = 200)

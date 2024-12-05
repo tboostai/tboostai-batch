@@ -14,7 +14,7 @@ public class GeneralConstants {
     public static final String BEARER = "Bearer ";
     public static final String ACCEPT_LANG = "Accept-Language";
     public static final String STAR = "*";
-    public static final int TIMEOUT_30_SECONDS = 30;
+    public static final int TIMEOUT_60_SECONDS = 60;
 
     // Ebay
     public static final String EBAY_CANADA = "EBAY_CA";
@@ -22,7 +22,7 @@ public class GeneralConstants {
     public static final String LIMIT = "limit";
     public static final String OFFSET = "offset";
     public static final String EBAY_HEADER_MARKET_PLACE = "X-EBAY-C-MARKETPLACE-ID";
-    public static final String EBAY_SEARCH_API_LIMIT_CALL_MAX = "50";
+    public static final String EBAY_SEARCH_API_LIMIT_CALL_MAX = "10";
 
     public static final int WEBCLIENT_BUFFER_SIZE = 1024 * 1024; //1MB
 

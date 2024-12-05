@@ -6,6 +6,7 @@ import com.tboostai_batch.entity.ebay.dto.EbayRespBasicDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -30,10 +31,13 @@ public class RedisService {
     // Cache for temporarily storing data to be written to Redis later
     private final Map<String, String> redisCache = new HashMap<>();
 
+    private final LettuceConnectionFactory lettuceConnectionFactory;
+
     @Autowired
-    public RedisService(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
+    public RedisService(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper, LettuceConnectionFactory lettuceConnectionFactory) {
         this.redisTemplate = redisTemplate;
         this.objectMapper = objectMapper;
+        this.lettuceConnectionFactory = lettuceConnectionFactory;
     }
 
     // -------------------
@@ -47,6 +51,7 @@ public class RedisService {
 
     // Retrieve the current nextURL from Redis
     public String getNextUrl() {
+        logger.info("RedisService - redis host is {} and redis port is {}", lettuceConnectionFactory.getHostName(), lettuceConnectionFactory.getPort());
         return redisTemplate.opsForValue().get(NEXT_URL_KEY);
     }
 

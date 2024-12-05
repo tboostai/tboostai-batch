@@ -12,9 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
-import org.springframework.batch.core.job.builder.SimpleJobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -26,7 +26,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.util.List;
 
 @Configuration
-@EnableBatchProcessing
+@EnableBatchProcessing(dataSourceRef = "batchDataSource", transactionManagerRef = "batchTransactionManager")
 public class EbayBatchJobConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(EbayBatchJobConfig.class);
@@ -44,7 +44,6 @@ public class EbayBatchJobConfig {
     private final EbayProductFetchAndProcessItemProcessor ebayProductFetchAndProcessItemProcessor;
     private final EbayProductFetchAndProcessItemWriter ebayProductFetchAndProcessItemWriter;
 
-
     @Autowired
     public EbayBatchJobConfig(JobRepository jobRepository,
                               PlatformTransactionManager transactionManager,
@@ -53,7 +52,7 @@ public class EbayBatchJobConfig {
                               ProductDetailsComponent productDetailsComponent,
                               EbayProductFetchAndProcessItemReader ebayProductFetchAndProcessItemReader,
                               EbayProductFetchAndProcessItemProcessor ebayProductFetchAndProcessItemProcessor,
-                              EbayProductFetchAndProcessItemWriter ebayProductFetchAndProcessItemWriter) {
+                              EbayProductFetchAndProcessItemWriter ebayProductFetchAndProcessItemWriter){
         this.jobRepository = jobRepository;
         this.transactionManager = transactionManager;
         this.tokenRequestComponent = tokenRequestComponent;
@@ -68,13 +67,12 @@ public class EbayBatchJobConfig {
     public Job ebayBatchJob(Step requestTokenStep, Step searchProductsStep, Step searchProductDetailsStep, Step readAndProcessProductDataChunkStep) {
         logger.info("Start building ebay batch job");
         JobBuilder jobBuilder = new JobBuilder("ebayRetrieveVehicleDataBatchJob", jobRepository);
-        SimpleJobBuilder simpleJobBuilder = jobBuilder.start(requestTokenStep)
+        return jobBuilder.start(requestTokenStep)
                 .next(searchProductsStep)
                 .next(searchProductDetailsStep)
                 .next(readAndProcessProductDataChunkStep)
-                .preventRestart();
-
-        return simpleJobBuilder.build();
+                .preventRestart()
+                .build();
     }
 
     // Step 1: 请求 Access Token
