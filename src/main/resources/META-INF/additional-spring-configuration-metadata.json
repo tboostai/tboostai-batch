@@ -61,11 +61,6 @@
       "description": "Description for EBAY_HOST."
     },
     {
-      "name": "Spring.microserver.service.tboostai.llm.host",
-      "type": "java.lang.String",
-      "description": "Description for Spring.microserver.service.tboostai.llm.host."
-    },
-    {
       "name": "spring.datasource.jdbcUrl",
       "type": "java.lang.String",
       "description": "Description for spring.datasource.jdbcUrl."

@@ -7,6 +7,7 @@ import com.tboostai_batch.entity.inner_model.*;
 import com.tboostai_batch.mapper.ebay.*;
 import com.tboostai_batch.service.LocationLatLngService;
 import com.tboostai_batch.service.VehicleInfoMappingService;
+import com.tboostai_batch.util.CleanDataUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -86,6 +87,11 @@ public class EbayProductFetchAndProcessItemProcessor implements ItemProcessor<Li
             // Map data to VehicleBasicInfo
             VehicleBasicInfo vehicleBasicInfo = vehicleInfoMapper.toVehicleBasicInfo(ebayRespBasicDTO);
             vehicleInfoMapper.mapLocalizedAspects(vehicleBasicInfo, ebayRespBasicDTO, vehicleInfoMappingService);
+
+            // Clean data: bodyType and engineType
+            vehicleBasicInfo.setBodyType(CleanDataUtils.cleanBodyType(vehicleBasicInfo.getBodyType()));
+            vehicleBasicInfo.setEngineType(CleanDataUtils.cleanEngineType(vehicleBasicInfo.getEngineType()));
+
 
             // Get latitude and longitude by specific address(postal code or address)
             locationLatLngService.fetchAndSaveLatLng(location);

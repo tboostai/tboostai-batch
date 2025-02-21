@@ -1,7 +1,10 @@
 package com.tboostai_batch.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tboostai_batch.entity.OpenAI.Message;
+import com.tboostai_batch.entity.OpenAI.OpenAIRequest;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -17,6 +20,8 @@ import java.util.function.Consumer;
 import static com.tboostai_batch.common.GeneralConstants.*;
 
 public class CommonTools {
+
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final Logger logger = LoggerFactory.getLogger(CommonTools.class);
 
@@ -154,17 +159,6 @@ public class CommonTools {
         }
     }
 
-    public static <T> T jsonStringToObj(String jsonStr, Class<T> clazz) {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        try {
-            return objectMapper.readValue(jsonStr, clazz);
-        } catch (Exception e) {
-            logger.error("Failed to parse map to JSON string", e);
-            return null;
-        }
-    }
-
     public static <T> void setIfNotNull(Consumer<T> setter, T value) {
         if (value != null) {
             setter.accept(value);
@@ -173,4 +167,60 @@ public class CommonTools {
     public static String mapListToString(List<String> stringList) {
         return (stringList != null && !stringList.isEmpty()) ? String.join(",", stringList) : null;
     }
+
+    public static Map<String, String> generateOpenAIRequestHeader(String openAIAPIKey) {
+        Map<String, String> requestHeaders = new HashMap<>();
+        requestHeaders.put(CONTENT_TYPE, APPLICATION_JSON);
+        requestHeaders.put(ACCEPT, APPLICATION_JSON);
+        requestHeaders.put(AUTHORIZATION, openAIAPIKey);
+
+        return requestHeaders;
+    }
+
+    public static Map<String, Object> buildOpenAIRequestBody(OpenAIRequest openAIRequest) {
+        Map<String, Object> body = new HashMap<>();
+        body.put(OPENAI_MODEL_KEY, OPENAI_MODEL_VALUE);
+
+        List<Map<String, String>> messages = new ArrayList<>();
+
+        for (Message message : openAIRequest.getMessages()) {
+            Map<String, String> messageMap = new HashMap<>();
+            messageMap.put(OPENAI_ROLE, message.getRole());
+            messageMap.put(OPENAI_CONTENT, message.getContent());
+            messages.add(messageMap);
+        }
+
+        body.put(OPENAI_MESSAGES, messages);
+
+        return body;
+    }
+
+    public static String parseObjToString(Object obj) {
+
+        String jsonBody = "";
+        try {
+            jsonBody = objectMapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            logger.error("Failed to build request body JSON", e);
+        }
+
+        logger.info("RequestBody is {}", jsonBody);
+
+        return jsonBody;
+    }
+
+    public static <T> T parseJsonToObject(String jsonBody, Class<T> clazz) {
+        logger.info("jsonBody is {}", jsonBody);
+        JsonNode root;
+        try {
+            root = objectMapper.readTree(jsonBody);
+            String content = root.path(OPENAI_CHOICES).get(0).path(OPENAI_MESSAGE).path(OPENAI_CONTENT).asText();
+            logger.info("Response content from OpenAI: {}", content);
+            return objectMapper.readValue(content, clazz);
+        } catch (JsonProcessingException e) {
+            logger.error("Failed to parse json response", e);
+        }
+        return null;
+    }
+
 }
